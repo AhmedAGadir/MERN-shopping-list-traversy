@@ -10,14 +10,21 @@ import store from './store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+import { loadUser } from './actions/authActions';
+
 class App extends React.Component {
+
+  componentDidMount() {
+    store.dispatch(loadUser());
+  }
+
   render() {
     return (
       <Provider store={store}>
         <div className="App">
           <AppNavbar></AppNavbar>
           <Container>
-            <ItemModal></ItemModal>
+            <ItemModal />
             <ShoppingList />
           </Container>
         </div>
