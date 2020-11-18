@@ -18,6 +18,47 @@ export const loadUser = () => (dispatch, getState) => {
     // user loading 
     dispatch({ type: USER_LOADING })
 
+    axios.get('api/auth/user', tokenConfig(getState))
+        .then(res => dispatch({
+            type: USER_LOADED,
+            payload: res.data
+        }))
+        .catch(err => {
+            dispatch(returnErrors(err.response.data, err.response.status))
+        })
+}
+
+// Register User
+export const register = ({ name, email, password }) => dispatch => {
+    // headers
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    // request body
+    const body = JSON.stringify({ name, email, password });
+
+    axios.post('/api/users', body, config)
+        .then(res => dispatch({
+            type: REGISTER_SUCCESS,
+            payload: res.data
+        }))
+        .catch(err => {
+            dispatch({
+                type: REGISTER_FAIL,
+            });
+            dispatch(returnErrors(err.response.data, err.response.status, 'REGISTER_FAIL'))
+        })
+}
+
+// logout user
+export const logout = () => ({
+    type: LOGOUT_SUCCESS
+})
+
+// setup config/headers and token 
+export const tokenConfig = getState => {
     // get token from localstorage;
     const token = getState().auth.token;
 
@@ -32,12 +73,6 @@ export const loadUser = () => (dispatch, getState) => {
     if (token) {
         config.headers["x-auth-token"] = token;
     }
-    axios.get('api/auth/user', config)
-        .then(res => dispatch({
-            type: USER_LOADED,
-            payload: res.data
-        }))
-        .catch(err => {
-            dispatch(returnErrors(err.response.data, err.response.status))
-        })
+
+    return config
 }
